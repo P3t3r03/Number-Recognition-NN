@@ -1,0 +1,32 @@
+{
+  "os":  "macOS-10.16-x86_64-i386-64bit",
+  "python":  "3.9.7",
+  "startedAt":  "2024-10-07T21:55:55.306213Z",
+  "program":  "/Users/peterleyden/PycharmProjects/ML Number Recognition/Main.py",
+  "codePath":  "Main.py",
+  "git":  {
+    "remote":  "https://github.com/P3t3r03/Number-Recognition-NN",
+    "commit":  "ee5c6d24b1eca3eb81e5f3b41a8b601448a03328"
+  },
+  "email":  "peterleyden03@gmail.com",
+  "root":  "/Users/peterleyden/PycharmProjects/ML Number Recognition",
+  "host":  "Peters-MacBook-Pro-2.local",
+  "username":  "peterleyden",
+  "executable":  "/Users/peterleyden/opt/anaconda3/bin/python",
+  "codePathLocal":  "Main.py",
+  "cpu_count":  8,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "494384795648",
+      "used":  "439689834496"
+    }
+  },
+  "memory":  {
+    "total":  "17179869184"
+  },
+  "cpu":  {
+    "count":  8,
+    "countLogical":  8
+  }
+}

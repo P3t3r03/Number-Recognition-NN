@@ -1,0 +1,18 @@
+{"time":"2024-10-07T22:59:34.068956+01:00","level":"INFO","msg":"using version","core version":"0.18.3"}
+{"time":"2024-10-07T22:59:34.069026+01:00","level":"INFO","msg":"created symlink","path":"/Users/peterleyden/PycharmProjects/ML Number Recognition/wandb/run-20241007_225934-yk0rdoyn/logs/debug-core.log"}
+{"time":"2024-10-07T22:59:34.087135+01:00","level":"ERROR","msg":"dialing: google: could not find default credentials. See https://cloud.google.com/docs/authentication/external/set-up-adc for more information"}
+{"time":"2024-10-07T22:59:34.123169+01:00","level":"INFO","msg":"created new stream","id":"yk0rdoyn"}
+{"time":"2024-10-07T22:59:34.123594+01:00","level":"INFO","msg":"stream: started","id":"yk0rdoyn"}
+{"time":"2024-10-07T22:59:34.123607+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T22:59:34.123878+01:00","level":"INFO","msg":"sender: started","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T22:59:34.123699+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T22:59:34.729732+01:00","level":"INFO","msg":"wandb-core","!BADKEY":null}
+{"time":"2024-10-07T22:59:34.731746+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-10-07T23:00:37.733737+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-10-07T23:00:37.734496+01:00","level":"INFO","msg":"stream: closing","id":"yk0rdoyn"}
+{"time":"2024-10-07T23:00:37.734602+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-10-07T23:00:38.549136+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-10-07T23:00:38.804557+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T23:00:38.805743+01:00","level":"INFO","msg":"sender: closed","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T23:00:38.805593+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"yk0rdoyn"}}
+{"time":"2024-10-07T23:00:38.807438+01:00","level":"INFO","msg":"stream: closed","id":"yk0rdoyn"}

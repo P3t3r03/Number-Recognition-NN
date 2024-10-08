@@ -9,6 +9,7 @@ from torchvision.utils import make_grid
 from torchvision.datasets import MNIST
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchsummary import summary
+import wandb
 
 from Initialise_dataset import mnist
 from One_Hidden_Layer_NN import My_NN
@@ -18,17 +19,29 @@ from Four_Hidden_Layers_NN import My_NN_4
 batch_sz=64 # this is batch size i.e. the number of rows in a batch of data
 train_loader, valid_loader, test_loader=mnist(batch_sz)  # Load all the data into train, validation, test sets
 
+# start a new wandb run to track this script
+wandb.init(
+    # set the wandb project where this run will be logged
+    project="number-recognition",
+
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": 0.05,
+    "architecture": "NN",
+    "dataset": "MNIST",
+    "epochs": 10,
+    }
+)
 # Test to see if we're loading the data correctly and visualizing the image
+# batch = next(iter(train_loader))  
+# plt.imshow(batch[0][52,0,:,:], cmap = "gray")
+# plt.title(batch[1][52])
+# plt.show()
 '''
-batch = next(iter(train_loader))  
-plt.imshow(batch[0][52,0,:,:], cmap = "gray")
-plt.title(batch[1][52])
-plt.show()
 '''
-'''
-device = torch.device("cpu")  # Selecting Device can you cuda:0 if you have a gpu
+device = torch.device("cpu")  # Selecting Device you can use cuda:0 if you have a gpu
 li = 28*28  # size of the image we're loading
-lh = 100  # Can change this around
+lh = 100  # Can change this around size of hidden layer
 lo = 10  # 10 output classes when classifying from 0-9
 
 net = My_NN(li, lh, lo).to(device)  # Initialises the Neural Network and passes it to the cpu/gpu
@@ -55,7 +68,10 @@ for i in range(num_epochs):
     loss.backward()  # Calculates new gradients for the parameters
     opt.step()  # Updates the parameters based on the gradients and learning rate
 
-  ls.append(total_loss/len(train_loader))  # Appends the loss for the Epoch.
+
+  ls.append(total_loss/len(train_loader)) 
+  wandb.log({"loss": loss})
+   # Appends the loss for the Epoch.
 ls_cpu = [loss.cpu().item() for loss in ls]  # Transfers the data back to the cpu if using gpu earlier
 
 # Plots Loss
@@ -102,92 +118,106 @@ for batch in test_loader:
 
 
 # Visualize Batch
-plt.figure(figsize=(16,16))
-for i in range(64):
-  plt.subplot(8,8, i+1)
-  plt.imshow(batch[0][i, 0,:,:])
-  plt.title(batch[1][i].item())
-  plt.axis('off')
-plt.show()
-'''
+# plt.figure(figsize=(16,16))
+# for i in range(64):
+#   plt.subplot(8,8, i+1)
+#   plt.imshow(batch[0][i, 0,:,:])
+#   plt.title(batch[1][i].item())
+#   plt.axis('off')
+# plt.show()
 
-device = torch.device("cpu")
-li = 28*28
-lh1 = 128
-lh2 = 128
-lh3 = 64
-lh4 = 64
-lo = 10
 
-net_4 = My_NN_4(li, lh1, lh2, lh3, lh4, lo).to(device)
-num_epochs = 200 # Takes much longer to run but seems to be plateau until 60~70ish epochs then decreasing loss.
-lr = 0.1
+# # start a new wandb run to track this script
+# wandb.init(
+#     # set the wandb project where this run will be logged
+#     project="my-awesome-project",
 
-opt = optim.SGD(net_4.parameters(), lr=lr)
-ls = []
-vls = []
+#     # track hyperparameters and run metadata
+#     config={
+#     "learning_rate": 0.02,
+#     "architecture": "CNN",
+#     "dataset": "CIFAR-100",
+#     "epochs": 10,
+#     }
+# )
 
-# Same as 1 hidden layer
-for i in range(num_epochs):
-  total_ls = 0
-  for batch in train_loader:
-    X, y = batch[0].to(device), batch[1].to(device)
-    #doing forward pass through the network
-    yhat = net_4.forward(X)
-    #calculating loss
-    loss = F.cross_entropy(yhat, y)
-    #emptyting hte optimizer buffes to store gradients
-    opt.zero_grad()
-    #calculating gradients
-    loss.backward()
-    #taking a step in the negative gradient direction
-    opt.step()
-    total_ls += loss
+# device = torch.device("cpu")
+# li = 28*28
+# lh1 = 128
+# lh2 = 128
+# lh3 = 64
+# lh4 = 64
+# lo = 10
 
-  with torch.no_grad():
-    val_ls = 0
-    for batch in valid_loader:
-      X, y = batch[0].to(device), batch[1].to(device)
-      yhat = net_4.forward(X)
-      # calculating loss
-      loss = F.cross_entropy(yhat, y)
-      val_ls += loss
+# net_4 = My_NN_4(li, lh1, lh2, lh3, lh4, lo).to(device)
+# num_epochs = 200 # Takes much longer to run but seems to be plateau until 60~70ish epochs then decreasing loss.
+# lr = 0.1
 
-  ls.append(total_ls/len(train_loader))
-  vls.append(val_ls/len(valid_loader))
+# opt = optim.SGD(net_4.parameters(), lr=lr)
+# ls = []
+# vls = []
 
-ls_cpu = [loss.cpu().item() for loss in ls]
-vls_cpu = [loss.cpu().item() for loss in vls]
-plt.plot(ls_cpu, 'b', label='Training Loss')
-plt.plot(vls_cpu, 'g', label='Validation Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
+# # Same as 1 hidden layer
+# for i in range(num_epochs):
+#   total_ls = 0
+#   for batch in train_loader:
+#     X, y = batch[0].to(device), batch[1].to(device)
+#     #doing forward pass through the network
+#     yhat = net_4.forward(X)
+#     #calculating loss
+#     loss = F.cross_entropy(yhat, y)
+#     #emptyting hte optimizer buffes to store gradients
+#     opt.zero_grad()
+#     #calculating gradients
+#     loss.backward()
+#     #taking a step in the negative gradient direction
+#     opt.step()
+#     total_ls += loss
 
-ys = []
-yhats = []
+#   with torch.no_grad():
+#     val_ls = 0
+#     for batch in valid_loader:
+#       X, y = batch[0].to(device), batch[1].to(device)
+#       yhat = net_4.forward(X)
+#       # calculating loss
+#       loss = F.cross_entropy(yhat, y)
+#       val_ls += loss
 
-# Flag so that the computation is more efficient as we don't have to calculate the gradients as we're testing.
-with torch.no_grad():
-  # Retriving and calculating true and predicted classes
-  for batch in test_loader:
-    X, y = batch[0].to(device), batch[1].to(device)  # Sends the true and predicted classes to the device chosen(cpu/gpu)
-    yhat = net_4(X)  # No need to call forward as it has been overridden in class definition when using PyTorch
-    labels = torch.argmax(yhat, axis = 1)  # Labels the sample with the class it has the highest probability of being
-    # Extends the True and predicted class list
-    ys.extend(y.cpu().numpy())
-    yhats.extend(labels.cpu().numpy())
+#   ls.append(total_ls/len(train_loader))
+#   vls.append(val_ls/len(valid_loader))
 
-#Convert to np array
-ys = np.array(ys)
-yhats = np.array(yhats)
+# ls_cpu = [loss.cpu().item() for loss in ls]
+# vls_cpu = [loss.cpu().item() for loss in vls]
+# plt.plot(ls_cpu, 'b', label='Training Loss')
+# plt.plot(vls_cpu, 'g', label='Validation Loss')
+# plt.xlabel('Epoch')
+# plt.ylabel('Loss')
+# plt.legend()
+# plt.show()
 
-print(ys)
-print(yhats)
-print(ys.shape)
+# ys = []
+# yhats = []
 
-# compute the test accuracy
-num_all_test_samples = len(ys)
-num_correct = np.sum(ys == yhats)
-print(num_correct/ num_all_test_samples)
+# # Flag so that the computation is more efficient as we don't have to calculate the gradients as we're testing.
+# with torch.no_grad():
+#   # Retriving and calculating true and predicted classes
+#   for batch in test_loader:
+#     X, y = batch[0].to(device), batch[1].to(device)  # Sends the true and predicted classes to the device chosen(cpu/gpu)
+#     yhat = net_4(X)  # No need to call forward as it has been overridden in class definition when using PyTorch
+#     labels = torch.argmax(yhat, axis = 1)  # Labels the sample with the class it has the highest probability of being
+#     # Extends the True and predicted class list
+#     ys.extend(y.cpu().numpy())
+#     yhats.extend(labels.cpu().numpy())
+
+# #Convert to np array
+# ys = np.array(ys)
+# yhats = np.array(yhats)
+
+# print(ys)
+# print(yhats)
+# print(ys.shape)
+
+# # compute the test accuracy
+# num_all_test_samples = len(ys)
+# num_correct = np.sum(ys == yhats)
+# print(num_correct/ num_all_test_samples)
