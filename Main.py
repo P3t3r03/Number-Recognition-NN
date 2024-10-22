@@ -16,21 +16,22 @@ from One_Hidden_Layer_NN import My_NN
 from Four_Hidden_Layers_NN import My_NN_4
 from CNN import CNN
 
-sweep_config = {
-      "method": "random",
-      "name": "sweep",
-      "architecture": "NN",
-      "dataset": "MNIST",
-      "metric": {"goal":"maximize", "name": "val_acc"},
-      "parameters": {
-        "batch_size": {"values": [16,32,64]},
-        "epochs": {"values":[5,10,15]},
-        "lr": {"max": 0.1, "min": 0.0001},
-      },
-}
+
+# sweep_config = {
+#       "method": "random",
+#       "name": "sweep",
+#       "architecture": "NN",
+#       "dataset": "MNIST",
+#       "metric": {"goal":"maximize", "name": "val_acc"},
+#       "parameters": {
+#         "batch_size": {"values": [16,32,64]},
+#         "epochs": {"values":[5,10,15]},
+#         "lr": {"max": 0.1, "min": 0.0001},
+#       },
+# }
 
 
-sweep_id = wandb.sweep(sweep=sweep_config, project="sweep_test_CNN")
+# sweep_id = wandb.sweep(sweep=sweep_config, project="sweep_test_CNN")
 
 
 
@@ -74,28 +75,28 @@ ls = []  # list of losses
 
 # Training Loop
 for i in range(num_epochs):
-  total_loss = 0  # Loss per Epoch
-  # Batch Loop
-  ys = []
-  yhats = []
-  for batch in train_loader:
-    X, y = batch[0].to(device), batch[1].to(device) # Sends Batch to Device to operate on
-    yhat = net.forward(X)  # forward pass called in Neural Network
-    loss = F.cross_entropy(yhat, y)  # Loss calculated for this batch
-    total_loss += loss
-    opt.zero_grad()  # Zeroes out Network parameter gradients so that we have a fresh start
-    # Backpropagation loss
-    loss.backward()  # Calculates new gradients for the parameters
-    opt.step()  # Updates the parameters based on the gradients and learning rate
+	total_loss = 0  # Loss per Epoch
+	# Batch Loop
+	ys = []
+	yhats = []
+	for batch in train_loader:
+		X, y = batch[0].to(device), batch[1].to(device) # Sends Batch to Device to operate on
+		yhat = net.forward(X)  # forward pass called in Neural Network
+		loss = F.cross_entropy(yhat, y)  # Loss calculated for this batch
+		total_loss += loss
+		opt.zero_grad()  # Zeroes out Network parameter gradients so that we have a fresh start
+		# Backpropagation loss
+		loss.backward()  # Calculates new gradients for the parameters
+		opt.step()  # Updates the parameters based on the gradients and learning rate
 
-   # Appends the loss for the Epoch.
+	 # Appends the loss for the Epoch.
 ls_cpu = [loss.cpu().item() for loss in ls]  # Transfers the data back to the cpu if using gpu earlier
 for batch in valid_loader:
-  X,y = batch[0].to(device), batch[1].to(device)
-  yhat = net(X)
-  labels = torch.argmax(yhat, axis=1)
-  ys.extend(y.cpu().numpy())
-  yhats.extend(labels.cpu().numpy())
+	X,y = batch[0].to(device), batch[1].to(device)
+	yhat = net(X)
+	labels = torch.argmax(yhat, axis=1)
+	ys.extend(y.cpu().numpy())
+	yhats.extend(labels.cpu().numpy())
 
 ys = np.array(ys)
 yhats = np.array(yhats)
@@ -106,78 +107,110 @@ ls.append(total_loss/len(train_loader))
 wandb.log({"loss": loss, "val_acc": val_acc})
 '''
 def train_model(train_loader, opt, device, net):
-  train_loss = 0
-  ys = []
-  yhats = []
-  for batch in train_loader:
-    X, y = batch[0].to(device), batch[1].to(device) # Sends Batch to Device to operate on
-    yhat = net.forward(X)  # forward pass called in Neural Network
-    loss = F.cross_entropy(yhat, y)  # Loss calculated for this batch
-    train_loss += F.cross_entropy(yhat, y)
-    opt.zero_grad()  # Zeroes out Network parameter gradients so that we have a fresh start
-    # Backpropagation loss
-    loss.backward()  # Calculates new gradients for the parameters
-    opt.step()  # Updates the parameters based on the gradients and learning rate
-    labels = torch.argmax(yhat, axis=1)
-    ys.extend(y.cpu().numpy())
-    yhats.extend(labels.cpu().numpy())
+	train_loss = 0
+	ys = []
+	yhats = []
+	for batch in train_loader:
+		X, y = batch[0].to(device), batch[1].to(device) # Sends Batch to Device to operate on
+		yhat = net.forward(X)  # forward pass called in Neural Network
+		loss = F.cross_entropy(yhat, y)  # Loss calculated for this batch
+		train_loss += F.cross_entropy(yhat, y)
+		opt.zero_grad()  # Zeroes out Network parameter gradients so that we have a fresh start
+		# Backpropagation loss
+		loss.backward()  # Calculates new gradients for the parametersN
+		opt.step()  # Updates the parameters based on the gradients and learning rate
+		labels = torch.argmax(yhat, axis=1)
+		ys.extend(y.cpu().numpy())
+		yhats.extend(labels.cpu().numpy())
 
 
-  ys = np.array(ys)
-  yhats = np.array(yhats)
-  num_all_test_samples = len(ys)
-  num_correct = np.sum(ys == yhats)
-  train_acc = num_correct / num_all_test_samples
+	ys = np.array(ys)
+	yhats = np.array(yhats)
+	num_all_test_samples = len(ys)
+	num_correct = np.sum(ys == yhats)
+	train_acc = num_correct / num_all_test_samples
  #  train_acc = train_acc / len(train_loader)
-  return train_acc, train_loss
+	return train_acc, train_loss
 
 def evaluate_model(valid_loader, device, net):
-  ys = []
-  yhats = []
-  for batch in valid_loader:
-    X,y = batch[0].to(device), batch[1].to(device)
-    yhat = net.forward(X)
-    val_loss = F.cross_entropy(yhat, y)
-    labels = torch.argmax(yhat, axis=1)
-    ys.extend(y.cpu().numpy())
-    yhats.extend(labels.cpu().numpy())
-  ys = np.array(ys)
-  yhats = np.array(yhats)
-  num_all_test_samples = len(ys)
-  num_correct = np.sum(ys == yhats)
-  val_acc = num_correct / num_all_test_samples
-  return val_acc, val_loss
-def main():
-  run = wandb.init()
+	ys = []
+	yhats = []
+	for batch in valid_loader:
+		X,y = batch[0].to(device), batch[1].to(device)
+		yhat = net.forward(X)
+		val_loss = F.cross_entropy(yhat, y)
+		labels = torch.argmax(yhat, axis=1)
+		ys.extend(y.cpu().numpy())
+		yhats.extend(labels.cpu().numpy())
+	ys = np.array(ys)
+	yhats = np.array(yhats)
+	num_all_test_samples = len(ys)
+	num_correct = np.sum(ys == yhats)
+	val_acc = num_correct / num_all_test_samples
+	return val_acc, val_loss
 
-  lr = wandb.config.lr
-  batch_sz = wandb.config.batch_size
-  epochs = wandb.config.epochs
-  train_loader, valid_loader, test_loader=mnist(batch_sz)
+def test_model(test_loader, device, net):
+	ys = []
+	yhats = []
+	for batch in test_loader:
+		X,y = batch[0].to(device), batch[1].to(device)
+		yhat = net.forward(X)
+		test_loss = F.cross_entropy(yhat, y)
+		labels = torch.argmax(yhat, axis=1)
+		ys.extend(y.cpu().numpy())
+		yhats.extend(labels.cpu().numpy())
+	ys = np.array(ys)
+	yhats = np.array(yhats)
+	num_all_test_samples = len(ys)
+	num_correct = np.sum(ys == yhats)
+	test_acc = num_correct / num_all_test_samples
+	return test_acc, test_loss
 
-  device = torch.device("cpu")  # Selecting Device you can use cuda:0 if you have a gpu
-  li = 28*28  # size of the image we're loading
-  lh = 100  # Can change this around size of hidden layer
-  lo = 10  # 10 output classes when classifying from 0-9
+if __name__ ==  "__main__":
+	wandb.init(
+	project="Remote_Machine_Experiment",
+	config={
+		"lr": 0.04 ,
+		"epochs": 10 ,
+		"batch_size": 16,
+		"Conv_Layer": 1
+	}
+	)
 
-  # net = My_NN(li, lh, lo).to(device)  # Initialises the Neural Network and passes it to the cpu/gpu
-  net = CNN()
-  opt = optim.SGD(net.parameters(), lr = lr)
+	lr = wandb.config.lr
+	batch_sz = wandb.config.batch_size
+	epochs = wandb.config.epochs
+	train_loader, valid_loader, test_loader=mnist(batch_sz)
 
-  for i in range(epochs):
-    train_acc, train_loss = train_model(train_loader, opt, device, net)
+	device = torch.device("mps")  # Selecting Device you can use cuda:0 if you have a gpu
+	li = 28*28  # size of the image we're loading
+	lh = 100  # Can change this around size of hidden layer
+	lo = 10  # 10 output classes when classifying from 0-9
 
-    val_acc, val_loss = evaluate_model(valid_loader, device, net)
+	# net = My_NN(li, lh, lo).to(device)  # Initialises the Neural Network and passes it to the cpu/gpu
+	net = CNN()
+	net.to(device)
+	opt = optim.SGD(net.parameters(), lr = lr)
 
-    wandb.log({
-      "epoch": i,
-      "train_acc": train_acc,
-      "train_loss": train_loss,
-      "val_acc": val_acc,
-      "val_loss": val_loss
-    })
+	for i in range(epochs):
+		train_acc, train_loss = train_model(train_loader, opt, device, net)
 
-wandb.agent(sweep_id, function=main, count = 100)
+		val_acc, val_loss = evaluate_model(valid_loader, device, net)
+
+		wandb.log({
+			"epoch": i,
+			"train_acc": train_acc,
+			"train_loss": train_loss,
+			"val_acc": val_acc,
+			"val_loss": val_loss
+		})
+	test_acc, test_loss = test_model(test_loader, device, net)
+	wandb.log({
+		"test_acc": test_acc,
+		"test_loss": test_loss
+	})
+
+# wandb.agent(sweep_id, function=main, count = 100)
 # Plots Loss
 # plt.plot(ls_cpu)
 # plt.xlabel('Epoch')
